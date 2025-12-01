@@ -1,97 +1,331 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# Swamy Hot Foods Mobile Admin App
 
-# Getting Started
+[![React Native](https://img.shields.io/badge/React%20Native-0.76-blue.svg)](https://reactnative.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.7-blue.svg)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-Proprietary-red.svg)]()
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+> Production-ready React Native admin application for managing Swamy Hot Foods restaurant operations in real-time.
 
-## Step 1: Start Metro
+---
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+## 📱 About
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+Swamy Hot Foods Mobile is an **admin-only** mobile application that enables restaurant staff to manage shop operations, menus, and users. Built with modern React Native best practices, featuring real-time updates via Server-Sent Events (SSE).
 
-```sh
-# Using npm
-npm start
+**Key Features:**
 
-# OR using Yarn
-yarn start
+- 🔐 JWT Authentication with secure token storage
+- 🏪 Real-time shop status management
+- 🍽️ Complete menu CRUD operations
+- 👥 User management (admin only)
+- 📡 Live updates via SSE
+- 🎨 Professional UI with React Native Paper
+- 📱 Responsive design for phones and tablets
+
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- Node.js >= 18
+- npm or yarn
+- React Native development environment ([Setup Guide](https://reactnative.dev/docs/environment-setup))
+- Android Studio (for Android) or Xcode (for iOS)
+
+### Installation
+
+```bash
+# Clone the repository
+git clone https://github.com/CVSCharan/swamyshotfoods_mobile.git
+cd swamyshotfoods_mobile
+
+# Install dependencies
+npm install
+
+# Setup environment variables
+cp .env.example .env
+# Edit .env with your API URL
+
+# iOS only - Install pods
+cd ios && pod install && cd ..
+
+# Run on Android
+npm run android
+
+# Run on iOS
+npm run ios
 ```
 
-## Step 2: Build and run your app
+---
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+## 📁 Project Structure
+
+```
+swamyshotfoods_mobile/
+├── src/                    # All source code
+│   ├── components/         # Reusable UI components
+│   ├── screens/           # App screens
+│   ├── services/          # API layer
+│   ├── stores/            # Zustand state management
+│   ├── hooks/             # Custom React hooks
+│   ├── navigation/        # Navigation setup
+│   ├── config/            # App configuration
+│   ├── theme/             # Theming
+│   └── App.tsx           # Root component
+├── android/               # Android native code
+├── ios/                   # iOS native code
+├── docs/                  # Documentation
+└── ...config files
+```
+
+See [docs/PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md) for detailed architecture.
+
+---
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+API_BASE_URL=http://localhost:5001/api
+ENVIRONMENT=development
+```
+
+**Available Environments:**
+
+- `development` - Local development
+- `staging` - Staging server
+- `production` - Production server
+
+---
+
+## 🎯 Features
+
+### Authentication
+
+- JWT-based login
+- Secure token storage (AsyncStorage)
+- Auto-login on app restart
+- Auto-logout on session expiry
+- Role-based access control
+
+### Dashboard (Shop Status)
+
+- Toggle shop Open/Closed
+- Enable Cooking mode
+- Set Holiday status with custom message
+- Notice Board for announcements
+- Upload shop logo
+- Real-time status updates via SSE
+
+### Menu Management
+
+- View all menu items
+- Add new items with images
+- Edit existing items
+- Delete items
+- Priority ordering
+
+### User Management (Admin Only)
+
+- Add new users
+- Set user roles (admin, staff, user)
+- Profile picture support
+
+---
+
+## 🏗️ Tech Stack
+
+**Framework:** React Native + TypeScript
+
+**UI Libraries:**
+
+- React Native Paper (Material Design)
+- NativeWind (Tailwind CSS)
+- Lucide React Native (Icons)
+
+**State Management:** Zustand
+
+**Navigation:** React Navigation (Bottom Tabs)
+
+**Real-time:** Server-Sent Events (SSE)
+
+**Storage:** AsyncStorage
+
+---
+
+## 📚 Documentation
+
+- [Project Overview](docs/PROJECT_OVERVIEW.md) - Complete architecture guide
+- [API Reference](docs/api.md) - Backend API documentation
+- [SSE Integration](docs/sse-integration-guide.md) - Real-time updates guide
+- [Design System](docs/design-system.md) - UI component guidelines
+- [Icons Guide](docs/lucide-icons.md) - Icon usage
+- [Paper Components](docs/react-native-paper.md) - React Native Paper guide
+
+---
+
+## 🛠️ Development
+
+### Available Scripts
+
+```bash
+# Start Metro bundler
+npm start
+
+# Run on Android
+npm run android
+
+# Run on iOS
+npm run ios
+
+# Run tests
+npm test
+
+# Lint code
+npm run lint
+
+# Format code
+npm run format
+```
+
+### Code Quality
+
+- **TypeScript**: 100% coverage
+- **ESLint**: Configured with React Native rules
+- **Prettier**: Code formatting
+- **Git Hooks**: Pre-commit linting (if configured)
+
+---
+
+## 🔐 Security
+
+- JWT tokens stored securely in AsyncStorage
+- Auto-logout on 401 Unauthorized
+- Environment variables for sensitive data
+- Role-based access control
+- Input validation on all forms
+
+---
+
+## 📱 Screenshots
+
+> Add screenshots here after deployment
+
+---
+
+## 🚢 Deployment
 
 ### Android
 
-```sh
-# Using npm
-npm run android
+```bash
+# Generate release APK
+cd android
+./gradlew assembleRelease
 
-# OR using Yarn
-yarn android
+# APK location: android/app/build/outputs/apk/release/app-release.apk
 ```
 
 ### iOS
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+```bash
+# Open in Xcode
+open ios/swamyshotfoods_mobile.xcworkspace
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
-
-```sh
-bundle install
+# Archive and upload to App Store Connect
 ```
 
-Then, and every time you update your native dependencies, run:
+---
 
-```sh
-bundle exec pod install
+## 🐛 Troubleshooting
+
+### Metro Bundler Issues
+
+```bash
+# Clear cache and restart
+npx react-native start --reset-cache
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+### Android Build Issues
 
-```sh
-# Using npm
+```bash
+# Clean and rebuild
+cd android
+./gradlew clean
+cd ..
+npm run android
+```
+
+### iOS Build Issues
+
+```bash
+# Clean and reinstall pods
+cd ios
+rm -rf Pods Podfile.lock
+pod install
+cd ..
 npm run ios
-
-# OR using Yarn
-yarn ios
 ```
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+---
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+## 📊 Project Status
 
-## Step 3: Modify your app
+**Version:** 1.0.0  
+**Status:** ✅ Production Ready  
+**Last Updated:** December 2025
 
-Now that you have successfully run the app, let's make changes!
+### Completed Features
 
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
+- ✅ Authentication system
+- ✅ Shop status management
+- ✅ Menu CRUD operations
+- ✅ User management
+- ✅ Real-time updates (SSE)
+- ✅ Professional navigation
+- ✅ Responsive design
+- ✅ Error handling
+- ✅ Loading states
 
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
+---
 
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
+## 🤝 Contributing
 
-## Congratulations! :tada:
+This is a private project for Swamy Hot Foods. For questions or contributions, please contact the development team.
 
-You've successfully run and modified your React Native App. :partying_face:
+---
 
-### Now what?
+## 📄 License
 
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
+Proprietary - Swamy Hot Foods © 2025
 
-# Troubleshooting
+---
 
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
+## 👥 Team
 
-# Learn More
+**Developer:** CVS Charan  
+**Organization:** Swamy Hot Foods
 
-To learn more about React Native, take a look at the following resources:
+---
 
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+## 🔗 Links
+
+- [Backend Repository](#) - API server
+- [Web Application](#) - Customer-facing Next.js app
+- [Documentation](docs/) - Complete docs
+
+---
+
+## 📞 Support
+
+For issues or questions:
+
+- Email: support@swamyshotfoods.com
+- GitHub Issues: [Create an issue](https://github.com/CVSCharan/swamyshotfoods_mobile/issues)
+
+---
+
+**Built with ❤️ using React Native**

@@ -1,6 +1,6 @@
 import { MD3LightTheme, MD3DarkTheme } from 'react-native-paper';
 
-// Swamy Hot Foods Light Theme
+// Swamy's Hot Foods Light Theme
 export const lightTheme = {
   ...MD3LightTheme,
   colors: {
@@ -58,7 +58,7 @@ export const lightTheme = {
   roundness: 12, // Match your design system
 };
 
-// Swamy Hot Foods Dark Theme
+// Swamy's Hot Foods Dark Theme
 export const darkTheme = {
   ...MD3DarkTheme,
   colors: {

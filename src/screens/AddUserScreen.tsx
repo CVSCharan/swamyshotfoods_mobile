@@ -8,23 +8,19 @@ import {
   Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme } from 'react-native-paper';
+import { useTheme, Text } from 'react-native-paper';
 import { User, Lock, Image as LucideImage } from 'lucide-react-native';
 
 import { Input } from '../components/Input';
+import { authService } from '../services/authService';
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
   CardDescription,
-  CardFooter,
 } from '../components/Card';
 import { Button } from '../components/Button';
-import { H1, P, Small } from '../components/Typography';
-
-// TODO: Move to environment variable after Metro cache is properly configured
-const BASE_URL = 'http://localhost:5001/api';
 
 interface RegisterResponse {
   username: string;
@@ -78,48 +74,31 @@ export default function AddUserScreen() {
     setLoading(true);
 
     try {
-      const response = await fetch(`${BASE_URL}/auth/register`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          username: username.trim(),
-          password,
-          role: 'user',
-          ...(pic.trim() && { pic: pic.trim() }),
-        }),
+      await authService.register({
+        username: username.trim(),
+        password,
+        role: 'user',
+        ...(pic.trim() && { pic: pic.trim() }),
       });
 
-      const data = await response.json();
-
-      if (response.ok) {
-        Alert.alert(
-          'Success! 🎉',
-          `User ${data.username} has been added successfully!`,
-          [
-            {
-              text: 'Add Another',
-              onPress: () => {
-                console.log('User added:', data);
-              },
-            },
-          ],
-        );
-        setUsername('');
-        setPassword('');
-        setConfirmPassword('');
-        setPic('');
-        setErrors({});
-      } else {
-        Alert.alert('Registration Failed', data.message || 'Please try again');
-      }
-    } catch (error) {
       Alert.alert(
-        'Network Error',
-        'Unable to connect to server. Please check your connection.',
+        'Success! 🎉',
+        `User ${username} has been added successfully!`,
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              setUsername('');
+              setPassword('');
+              setConfirmPassword('');
+              setPic('');
+              setErrors({});
+            },
+          },
+        ],
       );
-      console.error('Registration error:', error);
+    } catch (error: any) {
+      Alert.alert('Registration Failed', error.message || 'Please try again');
     } finally {
       setLoading(false);
     }
@@ -138,27 +117,29 @@ export default function AddUserScreen() {
           keyboardShouldPersistTaps="handled"
         >
           {/* Header */}
-          <View style={styles.header} className="md:mt-10">
-            <H1 className="text-center mb-2 text-5xl md:text-7xl">👥</H1>
-            <H1 className="text-center text-primary md:text-5xl">
+          <View style={styles.header}>
+            <Text variant="displaySmall" style={styles.emoji}>
+              👥
+            </Text>
+            <Text
+              variant="headlineLarge"
+              style={[styles.title, { color: theme.colors.primary }]}
+            >
               User Management
-            </H1>
-            <P className="text-center text-muted-foreground md:text-xl">
+            </Text>
+            <Text variant="bodyLarge" style={styles.subtitle}>
               Add a new user to the platform
-            </P>
+            </Text>
           </View>
 
           {/* Form Card */}
-          <View className="w-full max-w-md self-center">
-            <Card className="mx-4 md:mx-0">
+          <View style={styles.formContainer}>
+            <Card>
               <CardHeader>
-                <CardTitle className="md:text-2xl">Add New User</CardTitle>
-                <CardDescription className="md:text-lg">
-                  Enter user details below
-                </CardDescription>
+                <CardTitle>Add New User</CardTitle>
+                <CardDescription>Enter user details below</CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4 md:space-y-6">
-                {/* Username Input */}
+              <CardContent>
                 <Input
                   label="Username"
                   value={username}
@@ -174,7 +155,6 @@ export default function AddUserScreen() {
                   leftIcon={User}
                 />
 
-                {/* Password Input */}
                 <Input
                   label="Password"
                   value={password}
@@ -190,7 +170,6 @@ export default function AddUserScreen() {
                   leftIcon={Lock}
                 />
 
-                {/* Confirm Password Input */}
                 <Input
                   label="Confirm Password"
                   value={confirmPassword}
@@ -206,7 +185,6 @@ export default function AddUserScreen() {
                   leftIcon={Lock}
                 />
 
-                {/* Profile Picture URL (Optional) */}
                 <Input
                   label="Profile Picture URL (Optional)"
                   value={pic}
@@ -216,13 +194,12 @@ export default function AddUserScreen() {
                   leftIcon={LucideImage}
                 />
 
-                {/* Register Button */}
                 <Button
                   mode="contained"
                   onPress={handleRegister}
                   loading={loading}
                   disabled={loading}
-                  className="mt-4"
+                  style={styles.button}
                 >
                   Add User
                 </Button>
@@ -251,9 +228,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
-  logo: {
-    fontSize: 48,
-    marginBottom: 8,
+  emoji: {
+    fontSize: 64,
+    marginBottom: 16,
+    textAlign: 'center',
   },
   title: {
     fontWeight: '700',
@@ -262,24 +240,14 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     textAlign: 'center',
+    color: '#666',
   },
-  card: {
-    borderRadius: 16,
-    padding: 24,
-  },
-  input: {
-    marginBottom: 4,
+  formContainer: {
+    width: '100%',
+    maxWidth: 500,
+    alignSelf: 'center',
   },
   button: {
-    marginTop: 16,
-  },
-  buttonContent: {
-    paddingVertical: 8,
-  },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
     marginTop: 16,
   },
 });
