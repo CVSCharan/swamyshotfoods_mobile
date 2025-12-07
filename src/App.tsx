@@ -1,10 +1,3 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React, { useEffect } from 'react';
 import {
   View,
@@ -19,6 +12,7 @@ import { RootNavigator } from './navigation/RootNavigator';
 import LoginScreen from './screens/LoginScreen';
 import { useAuthStore } from './stores/useAuthStore';
 import { lightTheme, darkTheme } from './theme/paperTheme';
+import { ToastContainer } from './components/ui/Toast';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -47,6 +41,7 @@ function App() {
       <PaperProvider theme={theme}>
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
         {isAuthenticated ? <RootNavigator /> : <LoginScreen />}
+        <ToastContainer />
       </PaperProvider>
     </SafeAreaProvider>
   );
