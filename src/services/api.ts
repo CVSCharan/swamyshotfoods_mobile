@@ -26,25 +26,39 @@ class ApiClient {
   }
 
   private async handleResponse<T>(response: Response): Promise<T> {
-    // Handle 401 Unauthorized - auto logout
+    // Handle 401 Unauthorized
     if (response.status === 401) {
-      console.log('🔐 401 Unauthorized - Logging out user');
+      const errorData = await response.json().catch(() => ({}));
+      const token = await AsyncStorage.getItem(TOKEN_KEY);
 
-      // Clear tokens
-      await AsyncStorage.removeItem(TOKEN_KEY);
-      await AsyncStorage.removeItem('@swamys_user');
+      // Only treat as session expiration if user was logged in
+      if (token) {
+        console.log('🔐 401 Unauthorized - Session expired, logging out user');
 
-      // Import Alert dynamically to avoid circular dependencies
-      const { Alert } = await import('react-native');
+        // Clear tokens
+        await AsyncStorage.removeItem(TOKEN_KEY);
+        await AsyncStorage.removeItem('@swamys_user');
 
-      // Show user-friendly message
-      Alert.alert(
-        'Session Expired',
-        'Your session has expired. Please login again.',
-        [{ text: 'OK' }],
-      );
+        // Import Alert dynamically to avoid circular dependencies
+        const { Alert } = await import('react-native');
 
-      throw new ApiError('Session expired. Please login again.', 401);
+        // Show user-friendly message
+        Alert.alert(
+          'Session Expired',
+          'Your session has expired. Please login again.',
+          [{ text: 'OK' }],
+        );
+
+        throw new ApiError('Session expired. Please login again.', 401);
+      } else {
+        // Login failed - show actual error from API
+        console.log('🔐 401 Unauthorized - Login failed');
+        throw new ApiError(
+          errorData.message || 'Invalid credentials',
+          401,
+          errorData,
+        );
+      }
     }
 
     if (!response.ok) {

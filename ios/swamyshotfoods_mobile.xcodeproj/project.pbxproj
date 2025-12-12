@@ -11,6 +11,13 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		7CE33BD7F12B4E44876ACFCB /* Inter-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E7541CF6391F4A02A8198EAE /* Inter-Bold.ttf */; };
+		0416F45BD8414B1CB1D74345 /* Inter-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 896B881CBE1C4610B6F71A40 /* Inter-Medium.ttf */; };
+		F1E28DA3269C4F12BAA093BD /* Inter-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3299C82E228B416EB7897F60 /* Inter-Regular.ttf */; };
+		75607D4950C14E3FB705D73D /* Inter-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CFF88E6727E04AC6A3DA513C /* Inter-SemiBold.ttf */; };
+		769CE3BFD74047DFA63D74A6 /* PlayfairDisplay-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6709FA7B0B7F4132B111ED75 /* PlayfairDisplay-Bold.ttf */; };
+		33430F1C652D419AA340BB02 /* PlayfairDisplay-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = EE22A704FD7F40DDBFF58D6E /* PlayfairDisplay-Regular.ttf */; };
+		3AB42534CF02413F9DFCA0A5 /* PlayfairDisplay-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = C769C2A1775146B7BCF35B3E /* PlayfairDisplay-SemiBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +31,13 @@
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = swamyshotfoods_mobile/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = swamyshotfoods_mobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		E7541CF6391F4A02A8198EAE /* Inter-Bold.ttf */ = {isa = PBXFileReference; name = "Inter-Bold.ttf"; path = "../assets/fonts/Inter-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		896B881CBE1C4610B6F71A40 /* Inter-Medium.ttf */ = {isa = PBXFileReference; name = "Inter-Medium.ttf"; path = "../assets/fonts/Inter-Medium.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		3299C82E228B416EB7897F60 /* Inter-Regular.ttf */ = {isa = PBXFileReference; name = "Inter-Regular.ttf"; path = "../assets/fonts/Inter-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		CFF88E6727E04AC6A3DA513C /* Inter-SemiBold.ttf */ = {isa = PBXFileReference; name = "Inter-SemiBold.ttf"; path = "../assets/fonts/Inter-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		6709FA7B0B7F4132B111ED75 /* PlayfairDisplay-Bold.ttf */ = {isa = PBXFileReference; name = "PlayfairDisplay-Bold.ttf"; path = "../assets/fonts/PlayfairDisplay-Bold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		EE22A704FD7F40DDBFF58D6E /* PlayfairDisplay-Regular.ttf */ = {isa = PBXFileReference; name = "PlayfairDisplay-Regular.ttf"; path = "../assets/fonts/PlayfairDisplay-Regular.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		C769C2A1775146B7BCF35B3E /* PlayfairDisplay-SemiBold.ttf */ = {isa = PBXFileReference; name = "PlayfairDisplay-SemiBold.ttf"; path = "../assets/fonts/PlayfairDisplay-SemiBold.ttf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +88,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				6E73A6642D6A474398D7648F /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -96,6 +111,21 @@
 			);
 			path = Pods;
 			sourceTree = "<group>";
+		};
+		6E73A6642D6A474398D7648F /* Resources */ = {
+			isa = "PBXGroup";
+			children = (
+				E7541CF6391F4A02A8198EAE /* Inter-Bold.ttf */,
+				896B881CBE1C4610B6F71A40 /* Inter-Medium.ttf */,
+				3299C82E228B416EB7897F60 /* Inter-Regular.ttf */,
+				CFF88E6727E04AC6A3DA513C /* Inter-SemiBold.ttf */,
+				6709FA7B0B7F4132B111ED75 /* PlayfairDisplay-Bold.ttf */,
+				EE22A704FD7F40DDBFF58D6E /* PlayfairDisplay-Regular.ttf */,
+				C769C2A1775146B7BCF35B3E /* PlayfairDisplay-SemiBold.ttf */,
+			);
+			name = Resources;
+			sourceTree = "<group>";
+			path = "";
 		};
 /* End PBXGroup section */
 
@@ -159,6 +189,13 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				7CE33BD7F12B4E44876ACFCB /* Inter-Bold.ttf in Resources */,
+				0416F45BD8414B1CB1D74345 /* Inter-Medium.ttf in Resources */,
+				F1E28DA3269C4F12BAA093BD /* Inter-Regular.ttf in Resources */,
+				75607D4950C14E3FB705D73D /* Inter-SemiBold.ttf in Resources */,
+				769CE3BFD74047DFA63D74A6 /* PlayfairDisplay-Bold.ttf in Resources */,
+				33430F1C652D419AA340BB02 /* PlayfairDisplay-Regular.ttf in Resources */,
+				3AB42534CF02413F9DFCA0A5 /* PlayfairDisplay-SemiBold.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -27,6 +27,7 @@ import {
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Badge } from '../components/Badge';
+import { CustomHeader } from '../components/CustomHeader';
 
 export default function ShopStatusScreen() {
   const theme = useTheme();
@@ -85,6 +86,7 @@ export default function ShopStatusScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <CustomHeader title="Shop Management" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}

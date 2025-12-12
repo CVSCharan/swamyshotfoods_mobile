@@ -30,6 +30,7 @@ import { menuService } from '../services/menuService';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
+import { CustomHeader } from '../components/CustomHeader';
 
 export default function MenuManagementScreen() {
   const theme = useTheme();
@@ -199,6 +200,7 @@ export default function MenuManagementScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <CustomHeader title="Menu Management" />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>

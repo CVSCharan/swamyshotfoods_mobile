@@ -21,6 +21,7 @@ import {
   CardDescription,
 } from '../components/Card';
 import { Button } from '../components/Button';
+import { CustomHeader } from '../components/CustomHeader';
 
 interface RegisterResponse {
   username: string;
@@ -108,6 +109,7 @@ export default function AddUserScreen() {
     <SafeAreaView
       style={[styles.container, { backgroundColor: theme.colors.background }]}
     >
+      <CustomHeader title="User Management" />
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}

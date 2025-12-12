@@ -25,6 +25,7 @@ import { useAuthStore } from '../stores/useAuthStore';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
+import { CustomHeader } from '../components/CustomHeader';
 
 export default function ProfileScreen() {
   const theme = useTheme();
@@ -78,6 +79,7 @@ export default function ProfileScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <CustomHeader title="My Profile" showLogout={false} />
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header with Logo */}
         <View style={styles.header}>
