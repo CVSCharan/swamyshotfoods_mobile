@@ -9,7 +9,9 @@ const RECONNECT_DELAY = 3000;
 
 export const useStoreConfigSSE = () => {
   const eventSourceRef = useRef<EventSource | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const { setConfig, setConnected, setError } = useStoreConfigStore();
 
   const connect = () => {
@@ -32,8 +34,8 @@ export const useStoreConfigSSE = () => {
       const handleMessage: EventSourceListener = event => {
         try {
           // react-native-sse returns data in event.data
-          if (event.data) {
-            const data = JSON.parse(event.data);
+          if ('data' in event && event.data) {
+            const data = JSON.parse(event.data as string);
             console.log('📦 SSE Data received:', data);
             setConfig(data);
           }
