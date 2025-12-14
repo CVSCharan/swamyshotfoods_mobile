@@ -28,6 +28,13 @@ import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { Badge } from '../components/Badge';
 import { CustomHeader } from '../components/CustomHeader';
+import {
+  spacing,
+  moderateScale,
+  DeviceSize,
+  getResponsiveValue,
+  fontSize,
+} from '../utils/responsive';
 
 export default function ShopStatusScreen() {
   const theme = useTheme();
@@ -84,6 +91,13 @@ export default function ShopStatusScreen() {
     );
   }
 
+  const logoSize = getResponsiveValue({
+    small: 100,
+    medium: 120,
+    large: 140,
+    default: 120,
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       <CustomHeader title="Shop Management" />
@@ -91,11 +105,23 @@ export default function ShopStatusScreen() {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.keyboardView}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.logoSection}>
-              <View style={styles.logoContainer}>
+              <View
+                style={[
+                  styles.logoContainer,
+                  {
+                    width: logoSize,
+                    height: logoSize,
+                    borderRadius: logoSize / 2,
+                  },
+                ]}
+              >
                 <Image
                   source={require('../../pngs/logo.png')}
                   style={styles.logoImage}
@@ -105,13 +131,13 @@ export default function ShopStatusScreen() {
             </View>
 
             <Text
-              variant="headlineMedium"
+              variant={DeviceSize.isSmall ? 'headlineSmall' : 'headlineMedium'}
               style={[styles.title, { color: '#f4c430' }]}
             >
               Swamy's Hot Foods
             </Text>
             <Text
-              variant="bodyMedium"
+              variant={DeviceSize.isSmall ? 'bodySmall' : 'bodyMedium'}
               style={[styles.subtitle, { color: theme.colors.primary }]}
             >
               --- Pure Veg ---
@@ -140,7 +166,12 @@ export default function ShopStatusScreen() {
           </View>
 
           {/* Main Status Cards */}
-          <View style={styles.statusRow}>
+          <View
+            style={[
+              styles.statusRow,
+              DeviceSize.isTablet && styles.statusRowTablet,
+            ]}
+          >
             <Card style={styles.statusCard}>
               <CardContent style={styles.statusCardContent}>
                 <Text variant="bodyLarge" style={styles.statusLabel}>
@@ -183,7 +214,7 @@ export default function ShopStatusScreen() {
           {/* Notice Board */}
           <Card style={styles.card}>
             <CardHeader style={styles.cardHeaderRow}>
-              <View>
+              <View style={styles.cardHeaderText}>
                 <CardTitle>Notice Board</CardTitle>
                 <CardDescription>Announcements for customers</CardDescription>
               </View>
@@ -216,7 +247,7 @@ export default function ShopStatusScreen() {
           {/* Holiday Mode */}
           <Card style={styles.card}>
             <CardHeader style={styles.cardHeaderRow}>
-              <View>
+              <View style={styles.cardHeaderText}>
                 <CardTitle>Holiday Mode</CardTitle>
                 <CardDescription>Set shop as on holiday</CardDescription>
               </View>
@@ -284,8 +315,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
-    paddingBottom: 100,
+    padding: spacing.lg,
+    paddingBottom: moderateScale(100),
   },
   loadingContainer: {
     flex: 1,
@@ -293,78 +324,101 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 16,
+    marginTop: spacing.lg,
+    fontSize: fontSize.md,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.xxl,
   },
   logoSection: {
     position: 'relative',
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   logoContainer: {
-    width: 128,
-    height: 128,
-    borderRadius: 64,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 8,
   },
   logoImage: {
     width: '100%',
     height: '100%',
   },
   title: {
-    fontWeight: 'bold',
-    marginBottom: 4,
+    fontWeight: '700',
+    marginBottom: spacing.xs,
+    textAlign: 'center',
   },
   subtitle: {
-    color: '#666',
+    textAlign: 'center',
+    fontWeight: '500',
   },
   connectionStatus: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 8,
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+    backgroundColor: 'rgba(0,0,0,0.03)',
+    borderRadius: moderateScale(20),
   },
   statusDot: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
-    marginRight: 8,
+    width: moderateScale(10),
+    height: moderateScale(10),
+    borderRadius: moderateScale(5),
+    marginRight: spacing.sm,
   },
   statusText: {
-    fontSize: 14,
+    fontSize: fontSize.sm,
+    fontWeight: '600',
   },
   statusRow: {
-    flexDirection: 'row',
-    gap: 16,
-    marginBottom: 24,
+    flexDirection: DeviceSize.isSmall ? 'column' : 'row',
+    gap: spacing.lg,
+    marginBottom: spacing.xxl,
+  },
+  statusRowTablet: {
+    maxWidth: moderateScale(600),
+    alignSelf: 'center',
+    width: '100%',
   },
   statusCard: {
     flex: 1,
+    minWidth: DeviceSize.isSmall ? '100%' : undefined,
   },
   statusCardContent: {
     alignItems: 'center',
-    paddingTop: 24,
+    paddingTop: spacing.xxl,
+    paddingBottom: spacing.lg,
   },
   statusLabel: {
-    fontWeight: 'bold',
-    marginBottom: 8,
+    fontWeight: '700',
+    marginBottom: spacing.md,
+    fontSize: fontSize.lg,
   },
   statusBadge: {
-    marginTop: 8,
+    marginTop: spacing.md,
+    paddingHorizontal: spacing.lg,
   },
   card: {
-    marginBottom: 24,
+    marginBottom: spacing.xxl,
   },
   cardHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  cardHeaderText: {
+    flex: 1,
+    marginRight: spacing.md,
+  },
   inputContainer: {
-    marginBottom: 8,
+    marginBottom: spacing.md,
   },
 });

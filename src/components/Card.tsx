@@ -1,17 +1,119 @@
-import React from 'react';
-import { View, ViewProps, StyleSheet } from 'react-native';
+/**
+ * Enhanced Card Component
+ * Modern card with glassmorphism, fade-in animation, and press effects
+ */
+
+import React, { useEffect } from 'react';
+import { View, ViewProps, StyleSheet, Pressable } from 'react-native';
 import { Card as PaperCard, Text, useTheme } from 'react-native-paper';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated';
+import { BlurView } from '@react-native-community/blur';
+import { SPRING_CONFIGS, DURATIONS } from '../lib/animations';
+
+// ============================================================================
+// TYPES
+// ============================================================================
 
 type CardProps = React.ComponentProps<typeof PaperCard> & {
   style?: any;
   children: React.ReactNode;
+  glassmorphism?: boolean;
+  pressable?: boolean;
+  onPress?: () => void;
 };
 
-export function Card({ style, children, ...props }: CardProps) {
+// ============================================================================
+// ANIMATED COMPONENTS
+// ============================================================================
+
+const AnimatedCard = Animated.createAnimatedComponent(PaperCard);
+const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+
+// ============================================================================
+// CARD COMPONENT
+// ============================================================================
+
+export function Card({
+  style,
+  children,
+  glassmorphism = false,
+  pressable = false,
+  onPress,
+  ...props
+}: CardProps) {
+  const theme = useTheme();
+  const opacity = useSharedValue(0);
+  const scale = useSharedValue(0.95);
+  const pressScale = useSharedValue(1);
+
+  // Mount animation
+  useEffect(() => {
+    opacity.value = withTiming(1, { duration: DURATIONS.normal });
+    scale.value = withSpring(1, SPRING_CONFIGS.gentle);
+  }, [opacity, scale]);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      opacity: opacity.value,
+      transform: [{ scale: scale.value * pressScale.value }],
+    };
+  });
+
+  const handlePressIn = () => {
+    if (!pressable) return;
+    pressScale.value = withTiming(0.98, { duration: DURATIONS.fast });
+  };
+
+  const handlePressOut = () => {
+    if (!pressable) return;
+    pressScale.value = withSpring(1, SPRING_CONFIGS.snappy);
+  };
+
+  if (glassmorphism) {
+    return (
+      <AnimatedCard
+        style={[styles.card, styles.glassmorphism, animatedStyle, style]}
+        {...props}
+      >
+        <BlurView
+          style={styles.blur}
+          blurType="light"
+          blurAmount={10}
+          reducedTransparencyFallbackColor="white"
+        >
+          {children}
+        </BlurView>
+      </AnimatedCard>
+    );
+  }
+
+  if (pressable && onPress) {
+    return (
+      <AnimatedPressable
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        onPress={onPress}
+        style={animatedStyle}
+      >
+        <PaperCard style={[styles.card, styles.elevated, style]} {...props}>
+          {children}
+        </PaperCard>
+      </AnimatedPressable>
+    );
+  }
+
   return (
-    <PaperCard style={[styles.card, style]} {...props}>
+    <AnimatedCard
+      style={[styles.card, styles.elevated, animatedStyle, style]}
+      {...props}
+    >
       {children}
-    </PaperCard>
+    </AnimatedCard>
   );
 }
 
@@ -64,30 +166,55 @@ export function CardFooter({ style, children, ...props }: ViewProps) {
   );
 }
 
+// ============================================================================
+// STYLES
+// ============================================================================
+
 const styles = StyleSheet.create({
   card: {
     backgroundColor: '#fff',
-    borderRadius: 12,
-    elevation: 2,
+    borderRadius: 16,
+    overflow: 'hidden',
+  },
+  elevated: {
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 3,
+    },
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+  },
+  glassmorphism: {
+    backgroundColor: 'rgba(255, 255, 255, 0.7)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    elevation: 0,
+  },
+  blur: {
+    flex: 1,
   },
   header: {
-    padding: 24,
+    padding: 20,
     flexDirection: 'column',
   },
   title: {
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.15,
   },
   description: {
-    marginTop: 4,
+    marginTop: 6,
+    lineHeight: 20,
   },
   content: {
-    padding: 24,
+    padding: 20,
     paddingTop: 0,
   },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 24,
+    padding: 20,
     paddingTop: 0,
   },
 });
