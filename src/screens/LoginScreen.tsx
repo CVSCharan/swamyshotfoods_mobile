@@ -4,7 +4,6 @@ import {
   StyleSheet,
   KeyboardAvoidingView,
   Platform,
-  Alert,
   Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -21,6 +20,7 @@ import {
 } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
+import alert from '../lib/alert';
 
 export default function LoginScreen() {
   const [username, setUsername] = useState('');
@@ -36,7 +36,7 @@ export default function LoginScreen() {
 
     if (!username.trim() || !password.trim()) {
       console.log('❌ Validation failed: empty fields');
-      Alert.alert('Error', 'Please enter username and password');
+      alert.error('Error', 'Please enter username and password');
       return;
     }
 
@@ -52,7 +52,7 @@ export default function LoginScreen() {
       console.error('❌ Login error:', err);
       console.error('Error message:', err.message);
       console.error('Error stack:', err.stack);
-      Alert.alert(
+      alert.error(
         'Login Failed',
         err.message || 'Invalid username or password. Please try again.',
       );

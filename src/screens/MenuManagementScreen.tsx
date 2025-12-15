@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
-  Alert,
   FlatList,
   TouchableOpacity,
   StyleSheet,
@@ -31,6 +30,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { CustomHeader } from '../components/CustomHeader';
+import alert from '../lib/alert';
 
 export default function MenuManagementScreen() {
   const theme = useTheme();
@@ -69,7 +69,7 @@ export default function MenuManagementScreen() {
       const data = await menuService.getAll();
       setItems(data);
     } catch (err) {
-      Alert.alert('Error', 'Failed to fetch menu items');
+      alert.error('Error', 'Failed to fetch menu items');
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,7 @@ export default function MenuManagementScreen() {
 
   const handleAddItem = async () => {
     if (!formData.name || !formData.price) {
-      Alert.alert('Error', 'Name and Price are required');
+      alert.error('Error', 'Name and Price are required');
       return;
     }
 
@@ -87,9 +87,9 @@ export default function MenuManagementScreen() {
       addItem(newItem);
       setAddModalVisible(false);
       resetForm();
-      Alert.alert('Success', 'Menu item added successfully');
+      alert.success('Success', 'Menu item added successfully');
     } catch (err) {
-      Alert.alert('Error', 'Failed to add menu item');
+      alert.error('Error', 'Failed to add menu item');
     } finally {
       setLoading(false);
     }
@@ -104,9 +104,9 @@ export default function MenuManagementScreen() {
       updateItem(selectedItem._id, formData);
       setEditModalVisible(false);
       resetForm();
-      Alert.alert('Success', 'Menu item updated successfully');
+      alert.success('Success', 'Menu item updated successfully');
     } catch (err) {
-      Alert.alert('Error', 'Failed to update menu item');
+      alert.error('Error', 'Failed to update menu item');
     } finally {
       setLoading(false);
     }
@@ -121,9 +121,9 @@ export default function MenuManagementScreen() {
       deleteItem(selectedItem._id);
       setDeleteModalVisible(false);
       setSelectedItem(null);
-      Alert.alert('Success', 'Menu item deleted successfully');
+      alert.success('Success', 'Menu item deleted successfully');
     } catch (err) {
-      Alert.alert('Error', 'Failed to delete menu item');
+      alert.error('Error', 'Failed to delete menu item');
     } finally {
       setLoading(false);
     }

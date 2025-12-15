@@ -11,9 +11,9 @@ import { Text, useTheme } from 'react-native-paper';
 import { Menu, LogOut } from 'lucide-react-native';
 import { DrawerNavigationProp } from '@react-navigation/drawer';
 import { useNavigation } from '@react-navigation/native';
-import { Alert } from 'react-native';
 import { useAuthStore } from '../stores/useAuthStore';
 import LinearGradient from 'react-native-linear-gradient';
+import alert from '../lib/alert';
 
 const { width } = Dimensions.get('window');
 const isSmallDevice = width < 375;
@@ -75,16 +75,9 @@ export function CustomHeader({ title, showLogout = true }: CustomHeaderProps) {
   const { logout } = useAuthStore();
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Logout',
-        style: 'destructive',
-        onPress: async () => {
-          await logout();
-        },
-      },
-    ]);
+    alert.confirm('Logout', 'Are you sure you want to logout?', async () => {
+      await logout();
+    });
   };
 
   return (
