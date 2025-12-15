@@ -13,6 +13,7 @@ import LoginScreen from './screens/LoginScreen';
 import { useAuthStore } from './stores/useAuthStore';
 import { lightTheme, darkTheme } from './theme/paperTheme';
 import { ToastContainer } from './components/ui/Toast';
+import { AlertContainer } from './components/ui/AlertContainer';
 
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
@@ -42,6 +43,7 @@ function App() {
         <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
         {isAuthenticated ? <RootNavigator /> : <LoginScreen />}
         <ToastContainer />
+        <AlertContainer />
       </PaperProvider>
     </SafeAreaProvider>
   );

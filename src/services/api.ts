@@ -39,14 +39,13 @@ class ApiClient {
         await AsyncStorage.removeItem(TOKEN_KEY);
         await AsyncStorage.removeItem('@swamys_user');
 
-        // Import Alert dynamically to avoid circular dependencies
-        const { Alert } = await import('react-native');
+        // Import alert dynamically to avoid circular dependencies
+        const { showWarning } = await import('../lib/alert');
 
         // Show user-friendly message
-        Alert.alert(
+        showWarning(
           'Session Expired',
           'Your session has expired. Please login again.',
-          [{ text: 'OK' }],
         );
 
         throw new ApiError('Session expired. Please login again.', 401);

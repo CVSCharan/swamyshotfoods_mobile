@@ -5,7 +5,6 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTheme, Text } from 'react-native-paper';
@@ -22,6 +21,7 @@ import {
 } from '../components/Card';
 import { Button } from '../components/Button';
 import { CustomHeader } from '../components/CustomHeader';
+import alert from '../lib/alert';
 
 interface RegisterResponse {
   username: string;
@@ -82,24 +82,19 @@ export default function AddUserScreen() {
         ...(pic.trim() && { pic: pic.trim() }),
       });
 
-      Alert.alert(
+      alert.success(
         'Success! 🎉',
         `User ${username} has been added successfully!`,
-        [
-          {
-            text: 'OK',
-            onPress: () => {
-              setUsername('');
-              setPassword('');
-              setConfirmPassword('');
-              setPic('');
-              setErrors({});
-            },
-          },
-        ],
+        0, // Don't auto-dismiss
       );
+      // Reset form
+      setUsername('');
+      setPassword('');
+      setConfirmPassword('');
+      setPic('');
+      setErrors({});
     } catch (error: any) {
-      Alert.alert('Registration Failed', error.message || 'Please try again');
+      alert.error('Registration Failed', error.message || 'Please try again');
     } finally {
       setLoading(false);
     }

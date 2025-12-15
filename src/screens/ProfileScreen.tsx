@@ -3,7 +3,6 @@ import {
   View,
   ScrollView,
   StyleSheet,
-  Alert,
   TouchableOpacity,
   Image,
 } from 'react-native';
@@ -26,6 +25,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/Card';
 import { Button } from '../components/Button';
 import { Badge } from '../components/Badge';
 import { CustomHeader } from '../components/CustomHeader';
+import alert from '../lib/alert';
 
 export default function ProfileScreen() {
   const theme = useTheme();
@@ -33,26 +33,19 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Logout',
-        style: 'destructive',
-        onPress: async () => {
-          setLoading(true);
-          await logout();
-          setLoading(false);
-        },
-      },
-    ]);
+    alert.confirm('Logout', 'Are you sure you want to logout?', async () => {
+      setLoading(true);
+      await logout();
+      setLoading(false);
+    });
   };
 
   const handleEditProfile = () => {
-    Alert.alert('Edit Profile', 'Profile editing coming soon!');
+    alert.info('Edit Profile', 'Profile editing coming soon!');
   };
 
   const handleChangePassword = () => {
-    Alert.alert('Change Password', 'Password change coming soon!');
+    alert.info('Change Password', 'Password change coming soon!');
   };
 
   const getRoleBadgeVariant = (role: string) => {

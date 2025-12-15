@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   ScrollView,
-  Alert,
 } from 'react-native';
 import {
   DrawerContentScrollView,
@@ -24,6 +23,7 @@ import { Separator } from '../ui/Separator';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { lightColors } from '../../theme/colors';
 import { typography, spacing, borderRadius } from '../../theme/typography';
+import alert from '../../lib/alert';
 
 interface DrawerItemProps {
   label: string;
@@ -75,17 +75,10 @@ export const CustomDrawerContent: React.FC<
   const currentRoute = state.routes[state.index].name;
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Logout',
-        style: 'destructive',
-        onPress: async () => {
-          await logout();
-          navigation.closeDrawer();
-        },
-      },
-    ]);
+    alert.confirm('Logout', 'Are you sure you want to logout?', async () => {
+      await logout();
+      navigation.closeDrawer();
+    });
   };
 
   return (

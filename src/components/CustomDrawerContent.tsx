@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -19,9 +19,9 @@ import {
   LogOut,
   ChevronRight,
 } from 'lucide-react-native';
-import { Alert } from 'react-native';
 import { useAuthStore } from '../stores/useAuthStore';
 import LinearGradient from 'react-native-linear-gradient';
+import alert from '../lib/alert';
 
 const { width } = Dimensions.get('window');
 
@@ -160,18 +160,15 @@ export function CustomDrawerContent(props: DrawerContentComponentProps) {
   const theme = useTheme();
   const { logout, user } = useAuthStore();
   const { navigation, state } = props;
+  const [loading, setLoading] = useState(false);
 
   const handleLogout = () => {
-    Alert.alert('Logout', 'Are you sure you want to logout?', [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Logout',
-        style: 'destructive',
-        onPress: async () => {
-          await logout();
-        },
-      },
-    ]);
+    alert.confirm('Logout', 'Are you sure you want to logout?', async () => {
+      setLoading(true);
+      await logout();
+      setLoading(false);
+      navigation.closeDrawer();
+    });
   };
 
   const menuItems = [
