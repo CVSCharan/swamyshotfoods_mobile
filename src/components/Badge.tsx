@@ -1,125 +1,153 @@
 /**
- * Enhanced Badge Component
- * Modern badge with pulse animation and glow effects
+ * Professional Badge Component
+ * Clean, minimal badge with proper sizing to prevent text cutoff
  */
 
-import React, { useEffect } from 'react';
-import { StyleSheet } from 'react-native';
-import { Badge as PaperBadge, useTheme } from 'react-native-paper';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withRepeat,
-  withSequence,
-  withTiming,
-  withSpring,
-} from 'react-native-reanimated';
-import { DURATIONS, SPRING_CONFIGS } from '../lib/animations';
+import React from 'react';
+import { View, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import { useTheme } from 'react-native-paper';
+import { moderateScale, fontSize, spacing } from '../utils/responsive';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-interface BadgeProps extends React.ComponentProps<typeof PaperBadge> {
+interface BadgeProps {
+  children: React.ReactNode;
   variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'success';
-  pulse?: boolean;
-  glow?: boolean;
-  style?: any;
+  size?: 'sm' | 'md' | 'lg';
+  style?: ViewStyle;
+  textStyle?: TextStyle;
 }
-
-// ============================================================================
-// ANIMATED BADGE
-// ============================================================================
-
-const AnimatedBadge = Animated.createAnimatedComponent(PaperBadge);
 
 // ============================================================================
 // BADGE COMPONENT
 // ============================================================================
 
 export function Badge({
+  children,
   variant = 'default',
-  pulse = false,
-  glow = false,
+  size = 'md',
   style,
-  ...props
+  textStyle,
 }: BadgeProps) {
   const theme = useTheme();
-  const scale = useSharedValue(1);
-  const opacity = useSharedValue(1);
 
-  // Mount animation
-  useEffect(() => {
-    scale.value = withSpring(1, SPRING_CONFIGS.bouncy);
-  }, [scale]);
-
-  // Pulse animation
-  useEffect(() => {
-    if (pulse) {
-      scale.value = withRepeat(
-        withSequence(
-          withTiming(1.1, { duration: DURATIONS.normal }),
-          withTiming(1, { duration: DURATIONS.normal }),
-        ),
-        -1, // Infinite
-        false,
-      );
-    } else {
-      scale.value = withSpring(1, SPRING_CONFIGS.snappy);
-    }
-  }, [pulse, scale]);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [{ scale: scale.value }],
-    };
-  });
-
-  const getVariantStyle = () => {
+  const getVariantStyle = (): { container: ViewStyle; text: TextStyle } => {
     switch (variant) {
       case 'secondary':
         return {
-          backgroundColor: theme.colors.secondaryContainer,
-          color: theme.colors.onSecondaryContainer,
+          container: {
+            backgroundColor: theme.colors.secondaryContainer,
+            borderColor: theme.colors.secondary,
+          },
+          text: {
+            color: theme.colors.onSecondaryContainer,
+          },
         };
       case 'destructive':
         return {
-          backgroundColor: theme.colors.error,
-          color: theme.colors.onError,
+          container: {
+            backgroundColor: theme.colors.errorContainer,
+            borderColor: theme.colors.error,
+          },
+          text: {
+            color: theme.colors.error,
+          },
         };
       case 'success':
         return {
-          backgroundColor: theme.colors.primary,
-          color: theme.colors.onPrimary,
+          container: {
+            backgroundColor: theme.colors.primaryContainer,
+            borderColor: theme.colors.primary,
+          },
+          text: {
+            color: theme.colors.primary,
+          },
         };
       case 'outline':
         return {
-          backgroundColor: 'transparent',
-          borderWidth: 1.5,
-          borderColor: theme.colors.outline,
-          color: theme.colors.onSurface,
+          container: {
+            backgroundColor: 'transparent',
+            borderWidth: 1.5,
+            borderColor: theme.colors.outline,
+          },
+          text: {
+            color: theme.colors.onSurface,
+          },
         };
       default:
         return {
-          backgroundColor: theme.colors.primary,
-          color: theme.colors.onPrimary,
+          container: {
+            backgroundColor: theme.colors.primary,
+            borderColor: theme.colors.primary,
+          },
+          text: {
+            color: theme.colors.onPrimary,
+          },
+        };
+    }
+  };
+
+  const getSizeStyle = (): { container: ViewStyle; text: TextStyle } => {
+    switch (size) {
+      case 'sm':
+        return {
+          container: {
+            paddingHorizontal: spacing.sm,
+            paddingVertical: spacing.xs,
+            minWidth: moderateScale(50),
+          },
+          text: {
+            fontSize: fontSize.xs,
+          },
+        };
+      case 'lg':
+        return {
+          container: {
+            paddingHorizontal: spacing.lg,
+            paddingVertical: spacing.sm,
+            minWidth: moderateScale(80),
+          },
+          text: {
+            fontSize: fontSize.md,
+          },
+        };
+      default: // md
+        return {
+          container: {
+            paddingHorizontal: spacing.md,
+            paddingVertical: spacing.xs + 2,
+            minWidth: moderateScale(60),
+          },
+          text: {
+            fontSize: fontSize.sm,
+          },
         };
     }
   };
 
   const variantStyle = getVariantStyle();
+  const sizeStyle = getSizeStyle();
 
   return (
-    <AnimatedBadge
+    <View
       style={[
-        styles.badge,
-        variantStyle,
-        glow && variant !== 'outline' && styles.glow,
-        animatedStyle,
+        styles.container,
+        variantStyle.container,
+        sizeStyle.container,
         style,
       ]}
-      {...props}
-    />
+    >
+      <Text
+        style={[styles.text, variantStyle.text, sizeStyle.text, textStyle]}
+        numberOfLines={1}
+        adjustsFontSizeToFit
+        minimumFontScale={0.8}
+      >
+        {children}
+      </Text>
+    </View>
   );
 }
 
@@ -128,22 +156,25 @@ export function Badge({
 // ============================================================================
 
 const styles = StyleSheet.create({
-  badge: {
-    borderRadius: 12,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    fontSize: 12,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-  },
-  glow: {
-    elevation: 4,
-    shadowColor: '#16a34a',
+  container: {
+    borderRadius: moderateScale(8),
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
+    flexShrink: 0,
+    elevation: 2,
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 1,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  text: {
+    fontWeight: '700',
+    letterSpacing: 0.5,
+    textAlign: 'center',
+    textTransform: 'uppercase',
   },
 });

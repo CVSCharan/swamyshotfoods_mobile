@@ -13,6 +13,7 @@ import {
 import {
   Home,
   Menu as MenuIcon,
+  Plus,
   UserPlus,
   User,
   Clock,
@@ -121,19 +122,34 @@ export const CustomDrawerContent: React.FC<
             active={currentRoute === 'Dashboard'}
           />
           <DrawerItem
-            label="Menu Management"
+            label="Menu Items"
             icon={
               <MenuIcon
                 size={22}
                 color={
-                  currentRoute === 'Menu'
+                  currentRoute === 'MenuList'
                     ? lightColors.primary
                     : lightColors.textSecondary
                 }
               />
             }
-            onPress={() => navigation.navigate('Menu')}
-            active={currentRoute === 'Menu'}
+            onPress={() => navigation.navigate('MenuList')}
+            active={currentRoute === 'MenuList'}
+          />
+          <DrawerItem
+            label="Add Menu Item"
+            icon={
+              <Plus
+                size={22}
+                color={
+                  currentRoute === 'AddMenuItem'
+                    ? lightColors.primary
+                    : lightColors.textSecondary
+                }
+              />
+            }
+            onPress={() => navigation.navigate('AddMenuItem')}
+            active={currentRoute === 'AddMenuItem'}
           />
           {user?.role === 'admin' && (
             <>

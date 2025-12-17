@@ -1,38 +1,21 @@
 /**
- * Enhanced Card Component
- * Modern card with glassmorphism, fade-in animation, and press effects
+ * Professional Card Component
+ * Clean, minimal card with proper shadows and spacing
  */
 
-import React, { useEffect } from 'react';
-import { View, ViewProps, StyleSheet, Pressable } from 'react-native';
-import { Card as PaperCard, Text, useTheme } from 'react-native-paper';
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withSpring,
-  withTiming,
-} from 'react-native-reanimated';
-import { BlurView } from '@react-native-community/blur';
-import { SPRING_CONFIGS, DURATIONS } from '../lib/animations';
+import React from 'react';
+import { View, ViewProps, StyleSheet } from 'react-native';
+import { Text, useTheme } from 'react-native-paper';
+import { moderateScale, spacing } from '../utils/responsive';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-type CardProps = React.ComponentProps<typeof PaperCard> & {
-  style?: any;
+interface CardProps extends ViewProps {
   children: React.ReactNode;
-  glassmorphism?: boolean;
-  pressable?: boolean;
-  onPress?: () => void;
-};
-
-// ============================================================================
-// ANIMATED COMPONENTS
-// ============================================================================
-
-const AnimatedCard = Animated.createAnimatedComponent(PaperCard);
-const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
+  elevation?: 'low' | 'medium' | 'high';
+}
 
 // ============================================================================
 // CARD COMPONENT
@@ -41,79 +24,34 @@ const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 export function Card({
   style,
   children,
-  glassmorphism = false,
-  pressable = false,
-  onPress,
+  elevation = 'medium',
   ...props
 }: CardProps) {
   const theme = useTheme();
-  const opacity = useSharedValue(0);
-  const scale = useSharedValue(0.95);
-  const pressScale = useSharedValue(1);
 
-  // Mount animation
-  useEffect(() => {
-    opacity.value = withTiming(1, { duration: DURATIONS.normal });
-    scale.value = withSpring(1, SPRING_CONFIGS.gentle);
-  }, [opacity, scale]);
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      opacity: opacity.value,
-      transform: [{ scale: scale.value * pressScale.value }],
-    };
-  });
-
-  const handlePressIn = () => {
-    if (!pressable) return;
-    pressScale.value = withTiming(0.98, { duration: DURATIONS.fast });
+  const getElevationStyle = () => {
+    switch (elevation) {
+      case 'low':
+        return styles.elevationLow;
+      case 'high':
+        return styles.elevationHigh;
+      default:
+        return styles.elevationMedium;
+    }
   };
-
-  const handlePressOut = () => {
-    if (!pressable) return;
-    pressScale.value = withSpring(1, SPRING_CONFIGS.snappy);
-  };
-
-  if (glassmorphism) {
-    return (
-      <AnimatedCard
-        style={[styles.card, styles.glassmorphism, animatedStyle, style]}
-        {...props}
-      >
-        <BlurView
-          style={styles.blur}
-          blurType="light"
-          blurAmount={10}
-          reducedTransparencyFallbackColor="white"
-        >
-          {children}
-        </BlurView>
-      </AnimatedCard>
-    );
-  }
-
-  if (pressable && onPress) {
-    return (
-      <AnimatedPressable
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        onPress={onPress}
-        style={animatedStyle}
-      >
-        <PaperCard style={[styles.card, styles.elevated, style]} {...props}>
-          {children}
-        </PaperCard>
-      </AnimatedPressable>
-    );
-  }
 
   return (
-    <AnimatedCard
-      style={[styles.card, styles.elevated, animatedStyle, style]}
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: theme.colors.surface },
+        getElevationStyle(),
+        style,
+      ]}
       {...props}
     >
       {children}
-    </AnimatedCard>
+    </View>
   );
 }
 
@@ -126,8 +64,13 @@ export function CardHeader({ style, children, ...props }: ViewProps) {
 }
 
 export function CardTitle({ style, children, ...props }: any) {
+  const theme = useTheme();
   return (
-    <Text variant="titleLarge" style={[styles.title, style]} {...props}>
+    <Text
+      variant="titleLarge"
+      style={[styles.title, { color: theme.colors.onSurface }, style]}
+      {...props}
+    >
       {children}
     </Text>
   );
@@ -172,31 +115,43 @@ export function CardFooter({ style, children, ...props }: ViewProps) {
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: '#fff',
-    borderRadius: 16,
+    borderRadius: moderateScale(12),
     overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.06)',
   },
-  elevated: {
+  elevationLow: {
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+  },
+  elevationMedium: {
     elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  elevationHigh: {
+    elevation: 6,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 3,
     },
     shadowOpacity: 0.12,
-    shadowRadius: 6,
-  },
-  glassmorphism: {
-    backgroundColor: 'rgba(255, 255, 255, 0.7)',
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.3)',
-    elevation: 0,
-  },
-  blur: {
-    flex: 1,
+    shadowRadius: 8,
   },
   header: {
-    padding: 20,
+    padding: spacing.lg,
     flexDirection: 'column',
   },
   title: {
@@ -204,17 +159,17 @@ const styles = StyleSheet.create({
     letterSpacing: 0.15,
   },
   description: {
-    marginTop: 6,
+    marginTop: spacing.xs,
     lineHeight: 20,
   },
   content: {
-    padding: 20,
+    padding: spacing.lg,
     paddingTop: 0,
   },
   footer: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
+    padding: spacing.lg,
     paddingTop: 0,
   },
 });

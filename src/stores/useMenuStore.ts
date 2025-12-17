@@ -1,21 +1,25 @@
 import { create } from 'zustand';
 
+export interface ITimingSlot {
+  startTime: string; // Format: "5:30am"
+  endTime: string; // Format: "10:00am"
+}
+
 export interface MenuItem {
   _id: string;
   name: string;
   price: number;
   desc: string;
-  morningTimings?: {
-    startTime: string;
-    endTime: string;
-  } | null;
-  eveningTimings?: {
-    startTime: string;
-    endTime: string;
-  } | null;
-  ingredients: string;
+  morningTimings?: ITimingSlot | null;
+  eveningTimings?: ITimingSlot | null;
+  timingTemplate?: string | null;
+  ingredients: string[]; // Array of ingredient names
   priority: number;
   imgSrc: string;
+  dietaryLabels?: string[]; // Default: ["vegetarian"]
+  allergens?: string[]; // Default: []
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface MenuStore {

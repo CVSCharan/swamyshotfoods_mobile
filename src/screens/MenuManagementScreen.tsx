@@ -14,6 +14,9 @@ import {
   Modal,
   ActivityIndicator,
   Text,
+  Checkbox,
+  Divider,
+  Chip,
 } from 'react-native-paper';
 import FastImage from 'react-native-fast-image';
 import {
@@ -22,6 +25,7 @@ import {
   Trash2,
   ChevronDown,
   ChevronUp,
+  Clock,
 } from 'lucide-react-native';
 
 import { useMenuStore, MenuItem } from '../stores/useMenuStore';
@@ -30,7 +34,28 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/Card';
 import { Button } from '../components/Button';
 import { Input } from '../components/Input';
 import { CustomHeader } from '../components/CustomHeader';
+import { TimePicker } from '../components/ui/TimePicker';
+import { IngredientsManager } from '../components/ui/IngredientsManager';
+import { MultiSelectChips } from '../components/ui/MultiSelectChips';
 import alert from '../lib/alert';
+import { spacing, moderateScale, fontSize } from '../utils/responsive';
+
+// Dietary labels options
+const DIETARY_LABELS = [
+  { value: 'vegetarian', label: 'Vegetarian' },
+  { value: 'vegan', label: 'Vegan' },
+  { value: 'jain', label: 'Jain' },
+  { value: 'gluten-free', label: 'Gluten-free' },
+];
+
+// Allergens options
+const ALLERGENS = [
+  { value: 'nuts', label: 'Nuts' },
+  { value: 'dairy', label: 'Dairy' },
+  { value: 'soy', label: 'Soy' },
+  { value: 'eggs', label: 'Eggs' },
+  { value: 'gluten', label: 'Gluten' },
+];
 
 export default function MenuManagementScreen() {
   const theme = useTheme();
@@ -50,14 +75,24 @@ export default function MenuManagementScreen() {
   const [selectedItem, setSelectedItem] = useState<MenuItem | null>(null);
   const [isEditSectionOpen, setEditSectionOpen] = useState(false);
 
+  // Form state with proper types
   const [formData, setFormData] = useState<Partial<MenuItem>>({
     name: '',
     price: 0,
     desc: '',
-    ingredients: '',
+    ingredients: [],
     priority: 1,
     imgSrc: '',
+    dietaryLabels: ['vegetarian'],
+    allergens: [],
+    morningTimings: null,
+    eveningTimings: null,
+    timingTemplate: null,
   });
+
+  // Timing checkboxes
+  const [hasMorningTimings, setHasMorningTimings] = useState(false);
+  const [hasEveningTimings, setHasEveningTimings] = useState(false);
 
   useEffect(() => {
     fetchMenuItems();
@@ -81,6 +116,11 @@ export default function MenuManagementScreen() {
       return;
     }
 
+    if (!formData.ingredients || formData.ingredients.length === 0) {
+      alert.error('Error', 'At least one ingredient is required');
+      return;
+    }
+
     setLoading(true);
     try {
       const newItem = await menuService.create(formData);
@@ -97,6 +137,11 @@ export default function MenuManagementScreen() {
 
   const handleUpdateItem = async () => {
     if (!selectedItem) return;
+
+    if (!formData.ingredients || formData.ingredients.length === 0) {
+      alert.error('Error', 'At least one ingredient is required');
+      return;
+    }
 
     setLoading(true);
     try {
@@ -131,7 +176,14 @@ export default function MenuManagementScreen() {
 
   const openEditModal = (item: MenuItem) => {
     setSelectedItem(item);
-    setFormData(item);
+    setFormData({
+      ...item,
+      ingredients: item.ingredients || [],
+      dietaryLabels: item.dietaryLabels || ['vegetarian'],
+      allergens: item.allergens || [],
+    });
+    setHasMorningTimings(!!item.morningTimings);
+    setHasEveningTimings(!!item.eveningTimings);
     setEditModalVisible(true);
   };
 
@@ -145,49 +197,125 @@ export default function MenuManagementScreen() {
       name: '',
       price: 0,
       desc: '',
-      ingredients: '',
+      ingredients: [],
       priority: 1,
       imgSrc: '',
+      dietaryLabels: ['vegetarian'],
+      allergens: [],
+      morningTimings: null,
+      eveningTimings: null,
+      timingTemplate: null,
     });
     setSelectedItem(null);
+    setHasMorningTimings(false);
+    setHasEveningTimings(false);
   };
 
-  const renderMenuItem = ({ item }: { item: MenuItem }) => (
-    <Card style={styles.menuCard}>
-      <CardContent style={styles.menuCardContent}>
-        <FastImage
-          source={{ uri: item.imgSrc }}
-          style={styles.menuImage}
-          resizeMode={FastImage.resizeMode.cover}
-        />
-        <View style={styles.menuInfo}>
-          <Text variant="bodyLarge" style={styles.menuName}>
-            {item.name}
-          </Text>
-          <Text variant="bodyMedium" style={styles.menuPrice}>
-            ₹{item.price}
-          </Text>
-          <Text variant="bodySmall" style={styles.menuDesc}>
-            {item.desc}
-          </Text>
-        </View>
-        <View style={styles.menuActions}>
-          <TouchableOpacity
-            onPress={() => openEditModal(item)}
-            style={[styles.actionButton, styles.editButton]}
-          >
-            <Edit2 size={20} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => openDeleteModal(item)}
-            style={[styles.actionButton, styles.deleteButton]}
-          >
-            <Trash2 size={20} color="white" />
-          </TouchableOpacity>
-        </View>
-      </CardContent>
-    </Card>
-  );
+  // Check if item is currently available
+  const isAvailableNow = (item: MenuItem): boolean => {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentTime = currentHour * 60 + currentMinute;
+
+    const checkTimeSlot = (
+      timing: { startTime: string; endTime: string } | null | undefined,
+    ): boolean => {
+      if (!timing) return false;
+
+      const parseTime = (timeStr: string): number => {
+        const match = timeStr.match(/(\d+):(\d+)(am|pm)/i);
+        if (!match) return 0;
+        let hours = parseInt(match[1]);
+        const minutes = parseInt(match[2]);
+        const isPM = match[3].toLowerCase() === 'pm';
+        if (isPM && hours !== 12) hours += 12;
+        if (!isPM && hours === 12) hours = 0;
+        return hours * 60 + minutes;
+      };
+
+      const startTime = parseTime(timing.startTime);
+      const endTime = parseTime(timing.endTime);
+
+      return currentTime >= startTime && currentTime <= endTime;
+    };
+
+    return (
+      checkTimeSlot(item.morningTimings) || checkTimeSlot(item.eveningTimings)
+    );
+  };
+
+  const renderMenuItem = ({ item }: { item: MenuItem }) => {
+    const available = isAvailableNow(item);
+
+    return (
+      <Card style={styles.menuCard}>
+        <CardContent style={styles.menuCardContent}>
+          <FastImage
+            source={{ uri: item.imgSrc }}
+            style={styles.menuImage}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+          <View style={styles.menuInfo}>
+            <Text variant="bodyLarge" style={styles.menuName}>
+              {item.name}
+            </Text>
+            <Text variant="bodyMedium" style={styles.menuPrice}>
+              ₹{item.price}
+            </Text>
+            <Text variant="bodySmall" style={styles.menuDesc} numberOfLines={2}>
+              {item.desc}
+            </Text>
+
+            {/* Availability Status */}
+            {available && (
+              <View style={styles.availabilityBadge}>
+                <Clock size={moderateScale(12)} color="#16a34a" />
+                <Text variant="bodySmall" style={styles.availableText}>
+                  Available now
+                </Text>
+              </View>
+            )}
+
+            {/* Dietary Labels */}
+            {item.dietaryLabels && item.dietaryLabels.length > 0 && (
+              <View style={styles.chipsRow}>
+                {item.dietaryLabels.slice(0, 3).map(label => (
+                  <Chip
+                    key={label}
+                    compact
+                    style={styles.dietaryChip}
+                    textStyle={styles.chipText}
+                  >
+                    {label}
+                  </Chip>
+                ))}
+              </View>
+            )}
+
+            {/* Ingredients Count */}
+            <Text variant="bodySmall" style={styles.ingredientsCount}>
+              {item.ingredients?.length || 0} ingredients
+            </Text>
+          </View>
+          <View style={styles.menuActions}>
+            <TouchableOpacity
+              onPress={() => openEditModal(item)}
+              style={[styles.actionButton, styles.editButton]}
+            >
+              <Edit2 size={20} color="white" />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => openDeleteModal(item)}
+              style={[styles.actionButton, styles.deleteButton]}
+            >
+              <Trash2 size={20} color="white" />
+            </TouchableOpacity>
+          </View>
+        </CardContent>
+      </Card>
+    );
+  };
 
   if (loading && items.length === 0) {
     return (
@@ -274,60 +402,223 @@ export default function MenuManagementScreen() {
           }}
           contentContainerStyle={styles.modalContainer}
         >
-          <ScrollView>
+          <ScrollView showsVerticalScrollIndicator={true}>
             <Text variant="headlineSmall" style={styles.modalTitle}>
               {isEditModalVisible ? 'Edit' : 'Add'} Menu Item
             </Text>
+
+            {/* BASIC INFORMATION */}
+            <Text variant="titleMedium" style={styles.sectionTitle}>
+              📋 Basic Information
+            </Text>
+            <Divider style={styles.divider} />
 
             <Input
               label="Name *"
               value={formData.name}
               onChangeText={text => setFormData({ ...formData, name: text })}
+              placeholder="e.g., Idly with chutney (4 pieces)"
             />
 
             <Input
-              label="Price *"
-              value={formData.price?.toString()}
-              onChangeText={text =>
-                setFormData({ ...formData, price: parseFloat(text) || 0 })
-              }
-              keyboardType="numeric"
-            />
-
-            <Input
-              label="Description"
+              label="Description *"
               value={formData.desc}
               onChangeText={text => setFormData({ ...formData, desc: text })}
               multiline
               numberOfLines={3}
+              placeholder="Describe the dish..."
             />
 
-            <Input
-              label="Ingredients"
-              value={formData.ingredients}
-              onChangeText={text =>
-                setFormData({ ...formData, ingredients: text })
-              }
-              multiline
-              numberOfLines={2}
-            />
+            <View style={styles.row}>
+              <Input
+                label="Price (₹) *"
+                value={formData.price?.toString()}
+                onChangeText={text =>
+                  setFormData({ ...formData, price: parseFloat(text) || 0 })
+                }
+                keyboardType="numeric"
+                containerStyle={styles.halfWidth}
+              />
+
+              <Input
+                label="Priority *"
+                value={formData.priority?.toString()}
+                onChangeText={text =>
+                  setFormData({ ...formData, priority: parseInt(text) || 1 })
+                }
+                keyboardType="numeric"
+                containerStyle={styles.halfWidth}
+              />
+            </View>
 
             <Input
-              label="Priority"
-              value={formData.priority?.toString()}
-              onChangeText={text =>
-                setFormData({ ...formData, priority: parseInt(text) || 1 })
-              }
-              keyboardType="numeric"
-            />
-
-            <Input
-              label="Image URL"
+              label="Image URL *"
               value={formData.imgSrc}
               onChangeText={text => setFormData({ ...formData, imgSrc: text })}
-              containerStyle={styles.lastInput}
+              placeholder="https://..."
             />
 
+            {/* Image Preview */}
+            {formData.imgSrc && (
+              <FastImage
+                source={{ uri: formData.imgSrc }}
+                style={styles.imagePreview}
+                resizeMode={FastImage.resizeMode.cover}
+              />
+            )}
+
+            {/* AVAILABILITY TIMINGS */}
+            <Text variant="titleMedium" style={styles.sectionTitle}>
+              🕐 Availability Timings
+            </Text>
+            <Divider style={styles.divider} />
+
+            {/* Morning Timings */}
+            <View style={styles.checkboxRow}>
+              <Checkbox
+                status={hasMorningTimings ? 'checked' : 'unchecked'}
+                onPress={() => {
+                  setHasMorningTimings(!hasMorningTimings);
+                  if (hasMorningTimings) {
+                    setFormData({ ...formData, morningTimings: null });
+                  } else {
+                    setFormData({
+                      ...formData,
+                      morningTimings: {
+                        startTime: '5:30am',
+                        endTime: '10:00am',
+                      },
+                    });
+                  }
+                }}
+              />
+              <Text variant="bodyLarge">Morning Timings</Text>
+            </View>
+
+            {hasMorningTimings && (
+              <View style={styles.row}>
+                <TimePicker
+                  label="Start Time"
+                  value={formData.morningTimings?.startTime}
+                  onChange={time =>
+                    setFormData({
+                      ...formData,
+                      morningTimings: {
+                        ...formData.morningTimings!,
+                        startTime: time,
+                      },
+                    })
+                  }
+                  style={styles.halfWidth}
+                />
+                <TimePicker
+                  label="End Time"
+                  value={formData.morningTimings?.endTime}
+                  onChange={time =>
+                    setFormData({
+                      ...formData,
+                      morningTimings: {
+                        ...formData.morningTimings!,
+                        endTime: time,
+                      },
+                    })
+                  }
+                  style={styles.halfWidth}
+                />
+              </View>
+            )}
+
+            {/* Evening Timings */}
+            <View style={styles.checkboxRow}>
+              <Checkbox
+                status={hasEveningTimings ? 'checked' : 'unchecked'}
+                onPress={() => {
+                  setHasEveningTimings(!hasEveningTimings);
+                  if (hasEveningTimings) {
+                    setFormData({ ...formData, eveningTimings: null });
+                  } else {
+                    setFormData({
+                      ...formData,
+                      eveningTimings: {
+                        startTime: '4:30pm',
+                        endTime: '8:30pm',
+                      },
+                    });
+                  }
+                }}
+              />
+              <Text variant="bodyLarge">Evening Timings</Text>
+            </View>
+
+            {hasEveningTimings && (
+              <View style={styles.row}>
+                <TimePicker
+                  label="Start Time"
+                  value={formData.eveningTimings?.startTime}
+                  onChange={time =>
+                    setFormData({
+                      ...formData,
+                      eveningTimings: {
+                        ...formData.eveningTimings!,
+                        startTime: time,
+                      },
+                    })
+                  }
+                  style={styles.halfWidth}
+                />
+                <TimePicker
+                  label="End Time"
+                  value={formData.eveningTimings?.endTime}
+                  onChange={time =>
+                    setFormData({
+                      ...formData,
+                      eveningTimings: {
+                        ...formData.eveningTimings!,
+                        endTime: time,
+                      },
+                    })
+                  }
+                  style={styles.halfWidth}
+                />
+              </View>
+            )}
+
+            {/* INGREDIENTS */}
+            <Text variant="titleMedium" style={styles.sectionTitle}>
+              🥘 Ingredients
+            </Text>
+            <Divider style={styles.divider} />
+
+            <IngredientsManager
+              ingredients={formData.ingredients || []}
+              onChange={ingredients =>
+                setFormData({ ...formData, ingredients })
+              }
+            />
+
+            {/* DIETARY INFORMATION */}
+            <Text variant="titleMedium" style={styles.sectionTitle}>
+              🌱 Dietary Information
+            </Text>
+            <Divider style={styles.divider} />
+
+            <MultiSelectChips
+              label="Dietary Labels"
+              options={DIETARY_LABELS}
+              selectedValues={formData.dietaryLabels || []}
+              onChange={dietaryLabels =>
+                setFormData({ ...formData, dietaryLabels })
+              }
+            />
+
+            <MultiSelectChips
+              label="Allergens"
+              options={ALLERGENS}
+              selectedValues={formData.allergens || []}
+              onChange={allergens => setFormData({ ...formData, allergens })}
+            />
+
+            {/* Modal Actions */}
             <View style={styles.modalActions}>
               <Button
                 mode="contained"
@@ -394,7 +685,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   scrollContent: {
-    padding: 16,
+    padding: spacing.lg,
     paddingBottom: 100,
   },
   loadingContainer: {
@@ -403,20 +694,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   loadingText: {
-    marginTop: 16,
+    marginTop: spacing.lg,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: spacing.xxl,
   },
   logoContainer: {
-    width: 128,
-    height: 128,
-    borderRadius: 64,
+    width: moderateScale(128),
+    height: moderateScale(128),
+    borderRadius: moderateScale(64),
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 16,
+    marginBottom: spacing.lg,
     overflow: 'hidden',
   },
   logoImage: {
@@ -425,16 +716,16 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: 'bold',
-    marginBottom: 4,
+    marginBottom: spacing.xs,
   },
   subtitle: {
     color: '#666',
   },
   addButton: {
-    marginBottom: 24,
+    marginBottom: spacing.xxl,
   },
   card: {
-    marginBottom: 24,
+    marginBottom: spacing.xxl,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -442,42 +733,69 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   menuCard: {
-    marginBottom: 16,
+    marginBottom: spacing.lg,
   },
   menuCardContent: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
+    alignItems: 'flex-start',
+    padding: spacing.lg,
   },
   menuImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
+    width: moderateScale(80),
+    height: moderateScale(80),
+    borderRadius: moderateScale(8),
   },
   menuInfo: {
     flex: 1,
-    marginLeft: 16,
+    marginLeft: spacing.lg,
   },
   menuName: {
     fontWeight: 'bold',
-    fontSize: 18,
+    fontSize: fontSize.lg,
+    marginBottom: spacing.xs,
   },
   menuPrice: {
     color: '#16a34a',
     fontWeight: '600',
-    marginTop: 4,
+    marginBottom: spacing.xs,
   },
   menuDesc: {
     color: '#666',
-    marginTop: 4,
+    marginBottom: spacing.sm,
+  },
+  availabilityBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.xs,
+    marginBottom: spacing.xs,
+  },
+  availableText: {
+    color: '#16a34a',
+    fontWeight: '600',
+  },
+  chipsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.xs,
+    marginBottom: spacing.xs,
+  },
+  dietaryChip: {
+    height: moderateScale(24),
+  },
+  chipText: {
+    fontSize: fontSize.xs,
+  },
+  ingredientsCount: {
+    color: '#666',
+    fontStyle: 'italic',
   },
   menuActions: {
-    flexDirection: 'row',
-    gap: 8,
+    flexDirection: 'column',
+    gap: spacing.sm,
   },
   actionButton: {
-    padding: 8,
-    borderRadius: 8,
+    padding: spacing.sm,
+    borderRadius: moderateScale(8),
   },
   editButton: {
     backgroundColor: '#3b82f6',
@@ -487,20 +805,46 @@ const styles = StyleSheet.create({
   },
   modalContainer: {
     backgroundColor: 'white',
-    padding: 20,
-    margin: 20,
-    borderRadius: 12,
-    maxHeight: '80%',
+    padding: spacing.xl,
+    margin: spacing.xl,
+    borderRadius: moderateScale(12),
+    maxHeight: '90%',
   },
   modalTitle: {
-    marginBottom: 16,
+    marginBottom: spacing.lg,
+    fontWeight: 'bold',
   },
-  lastInput: {
-    marginBottom: 16,
+  sectionTitle: {
+    marginTop: spacing.lg,
+    marginBottom: spacing.sm,
+    fontWeight: '600',
+  },
+  divider: {
+    marginBottom: spacing.lg,
+  },
+  row: {
+    flexDirection: 'row',
+    gap: spacing.md,
+  },
+  halfWidth: {
+    flex: 1,
+  },
+  imagePreview: {
+    width: '100%',
+    height: moderateScale(200),
+    borderRadius: moderateScale(8),
+    marginTop: spacing.md,
+    marginBottom: spacing.lg,
+  },
+  checkboxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: spacing.md,
   },
   modalActions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: spacing.sm,
+    marginTop: spacing.xl,
   },
   modalButton: {
     flex: 1,
@@ -509,6 +853,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ef4444',
   },
   deleteText: {
-    marginBottom: 24,
+    marginBottom: spacing.xxl,
   },
 });

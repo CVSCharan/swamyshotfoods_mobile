@@ -26,7 +26,7 @@ interface StoreConfigStore {
 
 const initialState = {
   config: null,
-  isConnected: false,
+  isConnected: true, // Default to true to avoid showing error on initial load
   error: null,
 };
 
