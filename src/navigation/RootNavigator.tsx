@@ -3,7 +3,9 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import ShopStatusScreen from '../screens/ShopStatusScreen';
-import MenuManagementScreen from '../screens/MenuManagementScreen';
+import MenuListScreen from '../screens/MenuListScreen';
+import AddMenuItemScreen from '../screens/AddMenuItemScreen';
+import EditMenuItemScreen from '../screens/EditMenuItemScreen';
 import AddUserScreen from '../screens/AddUserScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import { useAuthStore } from '../stores/useAuthStore';
@@ -12,7 +14,11 @@ import { CustomDrawerContent } from '../components/CustomDrawerContent';
 
 export type RootDrawerParamList = {
   Dashboard: undefined;
-  Menu: undefined;
+  MenuList: undefined;
+  AddMenuItem: undefined;
+  EditMenuItem: {
+    itemId: string;
+  };
   Users: undefined;
   Profile: undefined;
 };
@@ -44,10 +50,26 @@ export function RootNavigator() {
           }}
         />
         <Drawer.Screen
-          name="Menu"
-          component={MenuManagementScreen}
+          name="MenuList"
+          component={MenuListScreen}
           options={{
-            title: 'Menu Management',
+            title: 'Menu Items',
+          }}
+        />
+        <Drawer.Screen
+          name="AddMenuItem"
+          component={AddMenuItemScreen}
+          options={{
+            title: 'Add Menu Item',
+            drawerItemStyle: { display: 'none' }, // Hide from drawer, accessible via FAB
+          }}
+        />
+        <Drawer.Screen
+          name="EditMenuItem"
+          component={EditMenuItemScreen}
+          options={{
+            title: 'Edit Menu Item',
+            drawerItemStyle: { display: 'none' }, // Hide from drawer, accessible via list
           }}
         />
         {user?.role === 'admin' && (

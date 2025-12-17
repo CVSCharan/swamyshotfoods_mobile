@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {
   View,
   ScrollView,
+  Alert,
   Platform,
   KeyboardAvoidingView,
   StyleSheet,
@@ -34,7 +35,6 @@ import {
   getResponsiveValue,
   fontSize,
 } from '../utils/responsive';
-import alert from '../lib/alert';
 
 export default function ShopStatusScreen() {
   const theme = useTheme();
@@ -74,9 +74,9 @@ export default function ShopStatusScreen() {
       if (config) {
         setConfig({ ...config, ...updates });
       }
-      alert.success('Success', 'Status updated successfully');
+      Alert.alert('Success', 'Status updated successfully');
     } catch (err) {
-      alert.error('Error', 'Failed to update status');
+      Alert.alert('Error', 'Failed to update status');
     } finally {
       setLoading(false);
     }
