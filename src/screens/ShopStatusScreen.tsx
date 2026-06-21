@@ -7,9 +7,11 @@ import {
   KeyboardAvoidingView,
   StyleSheet,
   Image,
+  TouchableOpacity,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useTheme, Switch, ActivityIndicator, Text } from 'react-native-paper';
+import { useTheme, Switch, ActivityIndicator, Text, IconButton } from 'react-native-paper';
+import { launchImageLibrary } from 'react-native-image-picker';
 
 import {
   useStoreConfigStore,
@@ -71,6 +73,36 @@ export default function ShopStatusScreen() {
       Alert.alert('Error', 'Failed to update status');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const pickImage = async () => {
+    try {
+      const result = await launchImageLibrary({
+        mediaType: 'photo',
+        includeBase64: true,
+        maxWidth: 500, // Compress dimensions to reduce Base64 size
+        maxHeight: 500,
+        quality: 0.6, // Compress quality to reduce Base64 size
+      });
+
+      if (result.didCancel) {
+        return;
+      }
+
+      if (result.errorCode) {
+        Alert.alert('Error', result.errorMessage || 'Failed to pick image');
+        return;
+      }
+
+      const asset = result.assets?.[0];
+      if (asset?.base64) {
+        const base64Str = `data:${asset.type || 'image/jpeg'};base64,${asset.base64}`;
+        // Update to backend
+        await updateConfig({ ownerAvatarUrl: base64Str });
+      }
+    } catch (err) {
+      Alert.alert('Error', 'An unexpected error occurred while picking the image');
     }
   };
 
@@ -177,6 +209,27 @@ export default function ShopStatusScreen() {
               </CardContent>
             </Card>
           </View>
+
+          {/* Owner Profile Picture */}
+          <Card style={styles.card}>
+            <CardHeader style={styles.cardHeaderRow}>
+              <View>
+                <CardTitle>Owner Profile Photo</CardTitle>
+                <CardDescription>Displayed on the website homepage</CardDescription>
+              </View>
+              <Button mode="outlined" onPress={pickImage} loading={loading}>
+                {config.ownerAvatarUrl ? 'Change Photo' : 'Upload Photo'}
+              </Button>
+            </CardHeader>
+            {config.ownerAvatarUrl && (
+              <CardContent style={{ alignItems: 'center', marginTop: 10 }}>
+                <Image
+                  source={{ uri: config.ownerAvatarUrl }}
+                  style={{ width: 100, height: 100, borderRadius: 50, borderWidth: 2, borderColor: theme.colors.primary }}
+                />
+              </CardContent>
+            )}
+          </Card>
 
           {/* Notice Board */}
           <Card style={styles.card}>
