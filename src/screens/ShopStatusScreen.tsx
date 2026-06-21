@@ -38,6 +38,7 @@ export default function ShopStatusScreen() {
   const [noticeText, setNoticeText] = useState('');
   const [holidayText, setHolidayText] = useState('');
   const [shopDesc, setShopDesc] = useState('');
+  const [menuFooterText, setMenuFooterText] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function ShopStatusScreen() {
       setNoticeText(config.noticeMessage || '');
       setHolidayText(config.holidayMessage || '');
       setShopDesc(config.description || '');
+      setMenuFooterText(config.menuFooterMessage || '');
     }
   }, [config]);
 
@@ -317,6 +319,31 @@ export default function ShopStatusScreen() {
                 loading={loading}
               >
                 Update Description
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Menu Footer Message */}
+          <Card style={styles.card}>
+            <CardHeader>
+              <CardTitle>Menu Footer Message</CardTitle>
+              <CardDescription>Displayed at the bottom of the public menu</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Input
+                multiline
+                numberOfLines={6}
+                value={menuFooterText}
+                onChangeText={setMenuFooterText}
+                placeholder="Enter ingredients & packing details (emojis allowed)..."
+                containerStyle={styles.inputContainer}
+              />
+              <Button
+                mode="contained"
+                onPress={() => updateConfig({ menuFooterMessage: menuFooterText })}
+                loading={loading}
+              >
+                Update Menu Footer
               </Button>
             </CardContent>
           </Card>

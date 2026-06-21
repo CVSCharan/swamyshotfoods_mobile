@@ -9,6 +9,7 @@ export interface StoreConfig {
   noticeMessage: string;
   description: string;
   currentStatusMsg: string;
+  menuFooterMessage?: string;
   ownerAvatarUrl?: string;
 }
 
