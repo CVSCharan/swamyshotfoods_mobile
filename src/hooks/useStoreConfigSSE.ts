@@ -4,7 +4,7 @@ import { useStoreConfigStore } from '../stores/useStoreConfigStore';
 import { config } from '../config/env';
 
 // Use the configured API base URL for SSE connection
-const SSE_URL = `${config.apiBaseUrl.replace('/api', '')}/api/store-config/sse`;
+const SSE_URL = `${config.apiBaseUrl}/store-config/sse`;
 const RECONNECT_DELAY = 3000;
 
 export const useStoreConfigSSE = () => {
